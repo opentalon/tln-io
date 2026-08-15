@@ -7,8 +7,31 @@
 
 tln core is effect-free: it decides *which* effects fire and hands them back as
 data; performing them is a plugin's job. `io-tln` is the plugin for the most
-basic effect — I/O. It implements `tln.ToolResolver`, so you wire it in the same
-way you wire the MCP tool plugin:
+basic effect — I/O. You write ordinary tln, calling the `io` server the same way
+you'd call any tool:
+
+```tln
+detect "Overdue for service" {
+  for records where type == "vehicle"
+    and attr "km" > attr "last_service_km" + 20000
+  flag matching items
+  remediate {
+    mcp "io" "writeln" { text "overdue: {item.id} at {attr.km} km" }
+    if attr "priority" == "CRITICAL" {
+      mcp "io" "eprintln" { text "CRITICAL: {item.id}" }
+    }
+  }
+}
+```
+
+`format` is printf-style, and reads come back as a bound value:
+
+```tln
+mcp "io" "format" { format "vehicle %s at %d km" args [attr "id", attr "km"] }
+mcp "io" "writeln" { text "loaded config" }
+```
+
+The host just installs the plugin once — same one-line wiring as tln-mcp:
 
 ```go
 import (
@@ -16,14 +39,7 @@ import (
     tlnio "github.com/opentalon/io-tln"
 )
 
-r := tlnio.New()                       // stdout / stderr / stdin
-tln.Run(ctx, prog, tln.WithToolResolver(r))
-```
-
-It answers one server (default `"io"`); a program invokes it like any tool:
-
-```tln
-mcp "io" "writeln" { text "service overdue: {item.name}" }
+tln.Run(ctx, prog, tln.WithToolResolver(tlnio.New()))   // stdout / stderr / stdin
 ```
 
 ## Tools
