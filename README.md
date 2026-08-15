@@ -16,9 +16,9 @@ detect "Overdue for service" {
     and attr "km" > attr "last_service_km" + 20000
   flag matching items
   remediate {
-    mcp "io" "writeln" { text "overdue: {item.id} at {attr.km} km" }
+    tool "io" "writeln" { text "overdue: {item.id} at {attr.km} km" }
     if attr "priority" == "CRITICAL" {
-      mcp "io" "eprintln" { text "CRITICAL: {item.id}" }
+      tool "io" "eprintln" { text "CRITICAL: {item.id}" }
     }
   }
 }
@@ -27,9 +27,26 @@ detect "Overdue for service" {
 `format` is printf-style, and reads come back as a bound value:
 
 ```tln
-mcp "io" "format" { format "vehicle %s at %d km" args [attr "id", attr "km"] }
-mcp "io" "writeln" { text "loaded config" }
+tool "io" "format" { format "vehicle %s at %d km" args [attr "id", attr "km"] }
+tool "io" "writeln" { text "loaded config" }
 ```
+
+## Connectors — stdout, stderr, or a file
+
+`io` isn't only stdout. A `connector` (tln [ADR 0012](https://github.com/opentalon/tln-language/blob/master/docs/design/0012-tool-verb-and-connectors.md)) picks the destination; the tool (`writeln`/`read`/…) is the operation. The name you call is the connector:
+
+```tln
+connector "io"    via io { }                                # stdout (default)
+connector "errs"  via io { stream stderr }                  # stderr
+connector "audit" via io { path "/var/log/tln/audit.log" }  # append to a file
+connector "input" via io { path "./events.txt" }            # read from a file
+
+tool "io"    "writeln"   { text "overdue: {item.id}" }      # → stdout
+tool "audit" "writeln"   { text "overdue: {item.id}" }      # → the file
+line = tool "input" "read_line" { }                         # ← the file
+```
+
+The runtime opens the file/stream from the connector and hands it to the plugin as the writer/reader (via `WithWriter` / `WithReader` below), so no secrets or paths live in Go. `io` needs no credentials; `env "…"` (for creds/endpoints) is an `mcp` concern, not an `io` one.
 
 The host just installs the plugin once — same one-line wiring as tln-mcp:
 
