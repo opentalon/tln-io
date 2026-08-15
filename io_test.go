@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	tlnio "github.com/opentalon/io-tln"
+	tlnio "github.com/opentalon/tln-io"
 )
 
 func TestWriteVariants(t *testing.T) {

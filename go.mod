@@ -1,4 +1,4 @@
-module github.com/opentalon/io-tln
+module github.com/opentalon/tln-io
 
 go 1.25.0
 

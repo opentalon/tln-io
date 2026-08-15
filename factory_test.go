@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	tlnio "github.com/opentalon/io-tln"
+	tlnio "github.com/opentalon/tln-io"
 	"github.com/opentalon/tln-language/pkg/tln"
 )
 

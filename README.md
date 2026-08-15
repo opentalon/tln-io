@@ -1,6 +1,6 @@
 # io-tln
 
-[![CI](https://github.com/opentalon/io-tln/actions/workflows/ci.yml/badge.svg)](https://github.com/opentalon/io-tln/actions/workflows/ci.yml)
+[![CI](https://github.com/opentalon/tln-io/actions/workflows/ci.yml/badge.svg)](https://github.com/opentalon/tln-io/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **Input/output plugin for [tln](https://github.com/opentalon/tln-language) — `write` / `print` / `read` as an engine plugin, injected exactly like [tln-mcp](https://github.com/opentalon/tln-mcp).**
@@ -53,7 +53,7 @@ The host just installs the plugin once — same one-line wiring as tln-mcp:
 ```go
 import (
     "github.com/opentalon/tln-language/pkg/tln"
-    tlnio "github.com/opentalon/io-tln"
+    tlnio "github.com/opentalon/tln-io"
 )
 
 tln.Run(ctx, prog, tln.WithToolResolver(tlnio.New()))   // stdout / stderr / stdin
